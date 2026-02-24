@@ -1,14 +1,79 @@
-import React from 'react'
-import UrlInput from './urlinput';
-import Iconcomponent from './iconcomponent';
+import React, { useEffect, useState } from "react";
+import UrlInput from "./urlinput";
+import Iconcomponent from "./iconcomponent";
+import { toast } from "sonner";
+
+type UrlData = {
+  originalUrl: string;
+  shortUrl: string;
+};
 
 const Sectionfourcontent = () => {
+  const [urlData, setUrlData] = useState<UrlData[]>([]);
+  const [copyIndex, setCopyIndex] = useState<number | null>(null);
+  const addUrl = (newUrl: UrlData) => {
+    setUrlData((prev) => [...prev, newUrl]);
+  };
+
+  const handleCopy = (shortUrl: string, copyIndex: number) => {
+    navigator.clipboard.writeText(shortUrl).then(
+      () => {
+        toast.success("Short URL copied to clipboard!");
+        setCopyIndex(copyIndex);
+        setTimeout(() => {
+          setCopyIndex(null);
+        }, 2000);
+      },
+      (err) => {
+        toast.error("Failed to copy: " + err);
+      },
+    );
+  };
+
+  useEffect(() => {
+    const storedUrls = localStorage.getItem("urlData");
+    if (storedUrls) {
+      setUrlData(JSON.parse(storedUrls));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("urlData", JSON.stringify(urlData));
+  }, [urlData]);
   return (
     <div className="bg-[#f0f1f5]  h-full relative dark:bg-black md:mt-0 mt-24 py-24 md:py-16 px-4 md:px-8 flex flex-col items-center justify-center gap-6 rounded-lg  w-full">
       <div className=" w-full mx-auto absolute top-0 left-0 -translate-y-1/2 px-4">
-        <UrlInput />
+        <UrlInput onAddUrl={addUrl} />
       </div>
-      <div className="flex flex-col items-center justify-center pt-12 md:pt-24 gap-6 mt-20 md:w-[70%]">
+      <div className="flex flex-col items-center justify-center mt-6 md:mt-16 md:w-[80%] font-sans w-[95%] mx-auto">
+        {/* <div className="mt-6  mx-auto bg-white py-4 px-4 rounded-xl flex flex-col items-center justify-between gap-4 w-full"> */}
+        {urlData.map((url, index) => (
+          <div
+            key={index}
+            className="mt-6  mx-auto bg-white py-4 px-4 rounded-xl flex flex-row items-center justify-between gap-4 w-full"
+          >
+            <h1 className="text-lg md:block hidden">{url.originalUrl}</h1>
+            <div className="flex flex-row items-center md:justify-end justify-between md:gap-4 w-full">
+              <h1 className=" text-sm  text-cyan-500 font-semibold md:text-lg">
+                {url.shortUrl}
+              </h1>
+              <button
+                onClick={() => handleCopy(url.shortUrl, index)}
+                className={` text-white font-semibold ml-4 px-4 py-1 rounded-xl ${
+                  copyIndex === index
+                    ? "bg-[#232127]"
+                    : "bg-cyan-500/70 hover:bg-cyan-600"
+                }`}
+              >
+                {copyIndex === index ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          </div>
+        ))}
+        {/* </div> */}
+      </div>
+
+      <div className="flex flex-col items-center justify-center pt-12 md:pt-24 gap-6  md:w-[70%]">
         <h1 className="text-3xl md:text-4xl  text-[#232127] font-bold text-center">
           Advanced Statistics
         </h1>
@@ -41,7 +106,19 @@ const Sectionfourcontent = () => {
       </div> */}
       <div className="relative flex flex-col md:flex-row gap-6  md:w-[80%] font-sans w-[95%] items-center justify-between">
         {/* Cyan line */}
-        <div className="hidden md:block absolute top-1/2 left-0 md:w-full md:h-2 w-2 h-full  bg-cyan-500/70 md:-translate-y-1/2"></div>
+        <div
+          className="
+  absolute
+  left-1/2 top-0
+  w-2 h-full
+  -translate-x-1/2
+  bg-cyan-500/70
+
+  md:left-0 md:top-1/2
+  md:w-full md:h-2
+  md:-translate-y-1/2 md:translate-x-0
+"
+        ></div>
 
         <div className="relative z-10">
           <Iconcomponent
@@ -69,6 +146,6 @@ const Sectionfourcontent = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Sectionfourcontent
+export default Sectionfourcontent;

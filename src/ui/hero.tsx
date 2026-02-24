@@ -2,7 +2,7 @@ import React from 'react'
 
 const Hero = () => {
   return (
-    <div className="md:w-full font-sans w-[95%] md:pl-4 flex md:flex-row flex-col items-center  justify-between py-12  md:py-24">
+    <div className="md:w-full font-sans w-[95%] md:pl-4 flex md:flex-row flex-col items-center  justify-between pt-24 pb-24 md:pt-24 md:pb-40">
       <div className="md:hidden  block w-full text-center mb-12">
         <img src="assets/illustration-working.svg" alt="Hero Image" />
       </div>
